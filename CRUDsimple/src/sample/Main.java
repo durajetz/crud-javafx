@@ -27,6 +27,7 @@ public class Main extends Application {
     private static TextField tfemri;
     private static TextField tfmosha;
     private static TextField tfId;
+    private static TextField tfSearch;
     private static String dbname = "CRUDtest";
 
     private static Connection getConnection() {
@@ -122,6 +123,9 @@ public class Main extends Application {
         tfemri = new TextField();
         tfmosha = new TextField();
         tfId = new TextField();
+        tfSearch = new TextField();
+        tfSearch.setPrefColumnCount(10);
+
         tfId.setPrefColumnCount(0);
         tfId.setVisible(false);
         HBox labelHb = new HBox(20);
@@ -142,6 +146,28 @@ public class Main extends Application {
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         Button addbtn = new Button("Add");
+        Button updatebtn = new Button("Update");
+        Button delbtn = new Button("Delete");
+        Button searchbtn = new Button("Search");
+
+        searchbtn.setOnAction(event -> {
+            try {
+                showData(idCol, emriCol, moshaCol, datakrijumeCol, "SELECT * FROM users WHERE emri LIKE '%" + tfSearch.getText() + "%'");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        tfSearch.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                try {
+                    showData(idCol, emriCol, moshaCol, datakrijumeCol, "SELECT * FROM users WHERE emri LIKE '%" + tfSearch.getText() + "%'");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         addbtn.setOnAction(event -> {
             try {
                 insertRecords();
@@ -150,7 +176,6 @@ public class Main extends Application {
             }
         });
 
-        Button delbtn = new Button("Delete");
         delbtn.setOnAction(event -> {
             try {
                 deleteRecords();
@@ -159,7 +184,6 @@ public class Main extends Application {
             }
         });
 
-        Button updatebtn = new Button("Update");
         updatebtn.setOnAction(event -> {
             try {
                 updateRecords();
@@ -171,14 +195,18 @@ public class Main extends Application {
         table.setOnMouseClicked(event -> handleMouseAction(event));
 
 
-        HBox buttonHb = new HBox(10);
+        HBox buttonHb = new HBox(25);
         buttonHb.setAlignment(Pos.CENTER);
         buttonHb.getChildren().addAll(addbtn, delbtn, updatebtn);
 
+        HBox searchbox = new HBox(10);
+        searchbox.setAlignment(Pos.CENTER);
+        searchbox.getChildren().addAll(tfSearch, searchbtn);
+
         VBox vbox = new VBox(20);
         vbox.setPadding(new Insets(25, 25, 25, 25));
-        ;
-        vbox.getChildren().addAll(labelHb, table, buttonHb);
+
+        vbox.getChildren().addAll(labelHb, table, buttonHb, searchbox);
 
         Scene scene = new Scene(vbox, 700, 550);
         primaryStage.setScene(scene);
